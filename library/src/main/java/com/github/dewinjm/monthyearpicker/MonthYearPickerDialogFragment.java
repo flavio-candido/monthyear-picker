@@ -17,8 +17,11 @@ public class MonthYearPickerDialogFragment extends DialogFragment {
     private static final String ARG_MAX_DATE = "max_date";
     private static final String ARG_LOCALE = "locale";
     private static final String ARG_MONTH_FORMAT = "monthFormat";
+    private static final String ARG_POSITIVE_BUTTON = "positive";
+    private static final String ARG_NEGATIVE_BUTTON = "negative";
+    private static final String ARG_NEUTRAL_BUTTON = "neutral";
 
-    private MonthYearPickerDialog.OnDateSetListener onDateSetListener;
+    private MonthYearPickerDialog.MonthYearPickerListener monthYearPickerListener;
 
     public MonthYearPickerDialogFragment() {
     }
@@ -49,17 +52,23 @@ public class MonthYearPickerDialogFragment extends DialogFragment {
     /**
      * Create a new instance of the DialogFragment
      *
-     * @param year   Year to show as selected
-     * @param month  Month to show as selected, the months are from (0-11) where 0 is January and 11 is December.
-     * @param title  set custom title.
-     * @param locale set specific locale from a language code.
+     * @param year             Year to show as selected
+     * @param month            Month to show as selected, the months are from (0-11) where 0 is January and 11 is December.
+     * @param title            set custom title.
+     * @param locale           set specific locale from a language code.
+     * @param positiveButton   set custom positive button name.
+     * @param negativeButton   set custom negative button name.
+     * @param neutralButton    set custom neutral button name.
      * @return the fragment instance
      */
     public static MonthYearPickerDialogFragment getInstance(int month,
                                                             int year,
                                                             String title,
-                                                            Locale locale) {
-        return getInstance(month, year, NULL_INT, NULL_INT, title, locale, MonthFormat.SHORT);
+                                                            Locale locale,
+                                                            String positiveButton,
+                                                            String negativeButton,
+                                                            String neutralButton) {
+        return getInstance(month, year, NULL_INT, NULL_INT, title, locale, MonthFormat.SHORT, positiveButton, negativeButton, neutralButton);
     }
 
     /**
@@ -75,7 +84,7 @@ public class MonthYearPickerDialogFragment extends DialogFragment {
                                                             int year,
                                                             String title,
                                                             MonthFormat monthFormat) {
-        return getInstance(month, year, NULL_INT, NULL_INT, title, null, monthFormat);
+        return getInstance(month, year, NULL_INT, NULL_INT, title, null, monthFormat, null, null, null);
     }
 
     /**
@@ -93,7 +102,7 @@ public class MonthYearPickerDialogFragment extends DialogFragment {
                                                             String title,
                                                             Locale locale,
                                                             MonthFormat monthFormat) {
-        return getInstance(month, year, NULL_INT, NULL_INT, title, locale, monthFormat);
+        return getInstance(month, year, NULL_INT, NULL_INT, title, locale, monthFormat, null, null, null);
     }
 
     /**
@@ -147,7 +156,34 @@ public class MonthYearPickerDialogFragment extends DialogFragment {
                                                             long maxDate,
                                                             String title,
                                                             Locale locale) {
-        return getInstance(month, year, minDate, maxDate, title, locale, MonthFormat.SHORT);
+        return getInstance(month, year, minDate, maxDate, title, locale, MonthFormat.SHORT, null, null, null);
+
+    }
+
+    /**
+     * Create a new instance of the DialogFragment
+     *
+     * @param year             Year to show as selected
+     * @param month            Month to show as selected, the months are from (0-11) where 0 is January and 11 is December.
+     * @param minDate          set the min date in milliseconds which should be less then initial date set.
+     * @param maxDate          set the max date in milliseconds which should not be less then current date.
+     * @param title            set custom title.
+     * @param locale           set specific locale from a language code.
+     * @param positiveButton   set custom positive button name.
+     * @param negativeButton   set custom negative button name.
+     * @param neutralButton    set custom neutral button name.
+     * @return MonthYearPickerDialogFragment
+     */
+    public static MonthYearPickerDialogFragment getInstance(int month,
+                                                            int year,
+                                                            long minDate,
+                                                            long maxDate,
+                                                            String title,
+                                                            Locale locale,
+                                                            String positiveButton,
+                                                            String negativeButton,
+                                                            String neutralButton) {
+        return getInstance(month, year, minDate, maxDate, title, locale, MonthFormat.SHORT, positiveButton, negativeButton, neutralButton);
 
     }
 
@@ -168,7 +204,7 @@ public class MonthYearPickerDialogFragment extends DialogFragment {
                                                             long maxDate,
                                                             String title,
                                                             MonthFormat monthFormat) {
-        return getInstance(month, year, minDate, maxDate, title, null, monthFormat);
+        return getInstance(month, year, minDate, maxDate, title, null, monthFormat, null, null, null);
 
     }
 
@@ -190,7 +226,10 @@ public class MonthYearPickerDialogFragment extends DialogFragment {
                                                             long maxDate,
                                                             String title,
                                                             Locale locale,
-                                                            MonthFormat monthFormat) {
+                                                            MonthFormat monthFormat,
+                                                            String positiveButton,
+                                                            String negativeButton,
+                                                            String neutralButton) {
         MonthYearPickerDialogFragment datePickerDialogFragment = new
                 MonthYearPickerDialogFragment();
 
@@ -200,6 +239,9 @@ public class MonthYearPickerDialogFragment extends DialogFragment {
         bundle.putLong(ARG_MIN_DATE, minDate);
         bundle.putLong(ARG_MAX_DATE, maxDate);
         bundle.putString(ARG_TITLE, title);
+        bundle.putString(ARG_POSITIVE_BUTTON, positiveButton);
+        bundle.putString(ARG_NEGATIVE_BUTTON, negativeButton);
+        bundle.putString(ARG_NEUTRAL_BUTTON, neutralButton);
         bundle.putSerializable(ARG_MONTH_FORMAT, monthFormat);
 
         if (locale != null)
@@ -212,8 +254,8 @@ public class MonthYearPickerDialogFragment extends DialogFragment {
     /**
      * Get callback of the year and month selected.
      */
-    public void setOnDateSetListener(MonthYearPickerDialog.OnDateSetListener onDateSetListener) {
-        this.onDateSetListener = onDateSetListener;
+    public void setMonthYearPickerListener(MonthYearPickerDialog.MonthYearPickerListener monthYearPickerListener) {
+        this.monthYearPickerListener = monthYearPickerListener;
     }
 
     @NonNull
@@ -229,6 +271,10 @@ public class MonthYearPickerDialogFragment extends DialogFragment {
         long minDate = dataBundle.getLong(ARG_MIN_DATE);
         long maxDate = dataBundle.getLong(ARG_MAX_DATE);
         String title = dataBundle.getString(ARG_TITLE);
+        String positiveButton = dataBundle.getString(ARG_POSITIVE_BUTTON);
+        String negativeButton = dataBundle.getString(ARG_NEGATIVE_BUTTON);
+        String neutralButton = dataBundle.getString(ARG_NEUTRAL_BUTTON);
+
         MonthFormat monthFormat = (MonthFormat) dataBundle.getSerializable(ARG_MONTH_FORMAT);
 
         Locale locale = Locale.getDefault();
@@ -246,7 +292,10 @@ public class MonthYearPickerDialogFragment extends DialogFragment {
                 year,
                 month,
                 monthFormat,
-                onDateSetListener);
+                monthYearPickerListener,
+                positiveButton,
+                negativeButton,
+                neutralButton);
 
         if (minDate != NULL_INT)
             simpleDatePickerDialog.setMinDate(minDate);

@@ -95,12 +95,22 @@ public class MainActivity extends AppCompatActivity {
                 createDialogWithRanges(customTitle) :
                 createDialog(customTitle);
 
-        dialogFragment.setOnDateSetListener(new MonthYearPickerDialog.OnDateSetListener() {
+        dialogFragment.setMonthYearPickerListener(new MonthYearPickerDialog.MonthYearPickerListener() {
             @Override
-            public void onDateSet(int year, int monthOfYear) {
+            public void onPositiveButtonClick(int year, int monthOfYear) {
                 monthSelected = monthOfYear;
                 yearSelected = year;
                 updateViews();
+            }
+
+            @Override
+            public void onNegativeClick() {
+                onBackPressed();
+            }
+
+            @Override
+            public void onNeutralButtonClick() {
+                onBackPressed();
             }
         });
 

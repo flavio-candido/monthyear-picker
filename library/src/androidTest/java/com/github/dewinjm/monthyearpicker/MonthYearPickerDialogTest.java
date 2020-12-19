@@ -89,9 +89,9 @@ public class MonthYearPickerDialogTest {
                         InstrumentationRegistry.getTargetContext(),
                         yearSelect,
                         monthSelect,
-                        new MonthYearPickerDialog.OnDateSetListener() {
+                        new MonthYearPickerDialog.MonthYearPickerListener() {
                             @Override
-                            public void onDateSet(int year, int monthOfYear) {
+                            public void onPositiveButtonClick(int year, int monthOfYear) {
                                 result[YEAR] = year;
                                 result[MONTH] = monthOfYear;
                                 latch.countDown();
@@ -123,9 +123,9 @@ public class MonthYearPickerDialogTest {
             public void run() {
                 MonthYearPickerDialog dialog = new MonthYearPickerDialog(
                         InstrumentationRegistry.getTargetContext(),
-                        new MonthYearPickerDialog.OnDateSetListener() {
+                        new MonthYearPickerDialog.MonthYearPickerListener() {
                             @Override
-                            public void onDateSet(int year, int monthOfYear) {
+                            public void onPositiveButtonClick(int year, int monthOfYear) {
                                 result[YEAR] = year;
                                 result[MONTH] = monthOfYear;
                                 latch.countDown();
@@ -160,9 +160,9 @@ public class MonthYearPickerDialogTest {
             public void run() {
                 MonthYearPickerDialog dialog = new MonthYearPickerDialog(
                         InstrumentationRegistry.getTargetContext(),
-                        new MonthYearPickerDialog.OnDateSetListener() {
+                        new MonthYearPickerDialog.MonthYearPickerListener() {
                             @Override
-                            public void onDateSet(int year, int monthOfYear) {
+                            public void onPositiveButtonClick(int year, int monthOfYear) {
                                 result[YEAR] = year;
                                 result[MONTH] = monthOfYear;
                             }

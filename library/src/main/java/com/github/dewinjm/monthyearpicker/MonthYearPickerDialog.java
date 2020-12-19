@@ -19,7 +19,7 @@ public class MonthYearPickerDialog extends AlertDialog implements DialogInterfac
     private static final String MONTH = "month";
 
     private Presenter presenter;
-    private OnDateSetListener onDateSetListener;
+    private MonthYearPickerListener monthYearPickerListener;
     private String title;
 
     /**
@@ -31,31 +31,37 @@ public class MonthYearPickerDialog extends AlertDialog implements DialogInterfac
     MonthYearPickerDialog(Context context,
                           int year,
                           int monthOfYear,
-                          OnDateSetListener listener) {
-        this(context, 0, year, monthOfYear, MonthFormat.SHORT, listener);
+                          MonthYearPickerListener listener) {
+        this(context, 0, year, monthOfYear, MonthFormat.SHORT, listener, null, null, null);
     }
 
     /**
-     * @param context     The context the dialog is to run in.
-     * @param year        Current year selected.
-     * @param monthOfYear Current month selected.
-     * @param monthFormat Set month format strings.
-     * @param listener    MonthYearPicker callback
+     * @param context          The context the dialog is to run in.
+     * @param year             Current year selected.
+     * @param monthOfYear      Current month selected.
+     * @param monthFormat      Set month format strings.
+     * @param listener         MonthYearPicker callback
+     * @param positiveButton   set custom positive button name.
+     * @param negativeButton   set custom negative button name.
+     * @param neutralButton    set custom neutral button name.
      */
     MonthYearPickerDialog(Context context,
                           int year,
                           int monthOfYear,
                           MonthFormat monthFormat,
-                          OnDateSetListener listener) {
-        this(context, 0, year, monthOfYear, monthFormat, listener);
+                          MonthYearPickerListener listener,
+                          String positiveButton,
+                          String negativeButton,
+                          String neutralButton) {
+        this(context, 0, year, monthOfYear, monthFormat, listener, positiveButton, negativeButton, neutralButton);
     }
 
     /**
      * @param context  The context the dialog is to run in.
      * @param listener MonthYearPicker callback
      */
-    MonthYearPickerDialog(Context context, OnDateSetListener listener) {
-        this(context, 0, 0, 0, MonthFormat.SHORT, listener);
+    MonthYearPickerDialog(Context context, MonthYearPickerListener listener) {
+        this(context, 0, 0, 0, MonthFormat.SHORT, listener, null, null, null);
     }
 
     /**
@@ -71,8 +77,11 @@ public class MonthYearPickerDialog extends AlertDialog implements DialogInterfac
                                   int year,
                                   int monthOfYear,
                                   MonthFormat monthFormat,
-                                  OnDateSetListener listener) {
-        this(context, theme, year, monthOfYear, true, monthFormat, listener);
+                                  MonthYearPickerListener listener,
+                                  String positiveButton,
+                                  String negativeButton,
+                                  String neutralButton) {
+        this(context, theme, year, monthOfYear, true, monthFormat, listener, positiveButton, negativeButton, neutralButton);
     }
 
     /**
@@ -83,6 +92,9 @@ public class MonthYearPickerDialog extends AlertDialog implements DialogInterfac
      * @param showSelectedDateTitle Set true or false if you want to show the selected date as a title.
      * @param monthFormat           Set month format strings.
      * @param listener              MonthYearPicker callback
+     * @param positiveButton        set custom positive button name.
+     * @param negativeButton        set custom negative button name.
+     * @param neutralButton         set custom neutral button name.
      */
     @SuppressLint("InflateParams")
     private MonthYearPickerDialog(Context context,
@@ -91,10 +103,13 @@ public class MonthYearPickerDialog extends AlertDialog implements DialogInterfac
                                   int monthOfYear,
                                   boolean showSelectedDateTitle,
                                   MonthFormat monthFormat,
-                                  OnDateSetListener listener) {
+                                  MonthYearPickerListener listener,
+                                  String positiveButton,
+                                  String negativeButton,
+                                  String neutralButton) {
         super(context, theme);
 
-        onDateSetListener = listener;
+        monthYearPickerListener = listener;
 
         Context themeContext = getContext();
         LayoutInflater inflater = LayoutInflater.from(themeContext);
@@ -104,8 +119,20 @@ public class MonthYearPickerDialog extends AlertDialog implements DialogInterfac
         if (showSelectedDateTitle)
             createTitle(year, monthOfYear);
 
-        setButton(BUTTON_POSITIVE, themeContext.getString(android.R.string.ok), this);
-        setButton(BUTTON_NEGATIVE, themeContext.getString(android.R.string.cancel), this);
+        if (positiveButton != null && !positiveButton.isEmpty()) {
+            setButton(BUTTON_POSITIVE, positiveButton, this);
+        } else {
+            setButton(BUTTON_POSITIVE, themeContext.getString(android.R.string.ok), this);
+        }
+
+        if (negativeButton != null && !negativeButton.isEmpty()) {
+            setButton(BUTTON_NEGATIVE, negativeButton, this);
+        } else {
+            setButton(BUTTON_NEGATIVE, themeContext.getString(android.R.string.cancel), this);
+        }
+
+        if (neutralButton != null && !neutralButton.isEmpty())
+        setButton(BUTTON_NEUTRAL, neutralButton, this);
 
         presenter = new Presenter(new PickerView(view), monthFormat);
         presenter.init(year, monthOfYear, this);
@@ -130,14 +157,21 @@ public class MonthYearPickerDialog extends AlertDialog implements DialogInterfac
     public void onClick(DialogInterface dialog, int which) {
         switch (which) {
             case BUTTON_POSITIVE:
-                if (onDateSetListener != null) {
-                    onDateSetListener.onDateSet(
+                if (monthYearPickerListener != null) {
+                    monthYearPickerListener.onPositiveButtonClick(
                             presenter.getYear(),
                             presenter.getMonth());
                 }
                 break;
             case BUTTON_NEGATIVE:
-                cancel();
+                if (monthYearPickerListener != null) {
+                    monthYearPickerListener.onNegativeClick();
+                }
+                break;
+            case BUTTON_NEUTRAL:
+                if (monthYearPickerListener != null) {
+                    monthYearPickerListener.onNeutralButtonClick();
+                }
                 break;
         }
     }
@@ -175,13 +209,15 @@ public class MonthYearPickerDialog extends AlertDialog implements DialogInterfac
     /**
      * The callback used to indicate the user is done filling in the date.
      */
-    public interface OnDateSetListener {
+    public interface MonthYearPickerListener {
 
         /**
          * @param year        The year that was set.
          * @param monthOfYear The month that was set (0-11) for compatibility with {@link
          *                    java.util.Calendar}.
          */
-        void onDateSet(int year, int monthOfYear);
+        void onPositiveButtonClick(int year, int monthOfYear);
+        void onNegativeClick();
+        void onNeutralButtonClick();
     }
 }
