@@ -158,19 +158,19 @@ public class MonthYearPickerDialog extends AlertDialog implements DialogInterfac
         switch (which) {
             case BUTTON_POSITIVE:
                 if (monthYearPickerListener != null) {
-                    monthYearPickerListener.onPositiveButtonClick(
+                    monthYearPickerListener.onDateSet(
                             presenter.getYear(),
                             presenter.getMonth());
                 }
                 break;
             case BUTTON_NEGATIVE:
-                if (monthYearPickerListener != null) {
-                    monthYearPickerListener.onNegativeClick();
-                }
+                cancel();
                 break;
             case BUTTON_NEUTRAL:
                 if (monthYearPickerListener != null) {
-                    monthYearPickerListener.onNeutralButtonClick();
+                    monthYearPickerListener.onDateSet(
+                            -1,
+                            -1);
                 }
                 break;
         }
@@ -216,8 +216,6 @@ public class MonthYearPickerDialog extends AlertDialog implements DialogInterfac
          * @param monthOfYear The month that was set (0-11) for compatibility with {@link
          *                    java.util.Calendar}.
          */
-        void onPositiveButtonClick(int year, int monthOfYear);
-        void onNegativeClick();
-        void onNeutralButtonClick();
+        void onDateSet(int year, int monthOfYear);
     }
 }

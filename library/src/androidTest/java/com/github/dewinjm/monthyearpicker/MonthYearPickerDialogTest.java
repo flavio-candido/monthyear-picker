@@ -91,7 +91,7 @@ public class MonthYearPickerDialogTest {
                         monthSelect,
                         new MonthYearPickerDialog.MonthYearPickerListener() {
                             @Override
-                            public void onPositiveButtonClick(int year, int monthOfYear) {
+                            public void onDateSet(int year, int monthOfYear) {
                                 result[YEAR] = year;
                                 result[MONTH] = monthOfYear;
                                 latch.countDown();
@@ -125,7 +125,7 @@ public class MonthYearPickerDialogTest {
                         InstrumentationRegistry.getTargetContext(),
                         new MonthYearPickerDialog.MonthYearPickerListener() {
                             @Override
-                            public void onPositiveButtonClick(int year, int monthOfYear) {
+                            public void onDateSet(int year, int monthOfYear) {
                                 result[YEAR] = year;
                                 result[MONTH] = monthOfYear;
                                 latch.countDown();
@@ -162,7 +162,7 @@ public class MonthYearPickerDialogTest {
                         InstrumentationRegistry.getTargetContext(),
                         new MonthYearPickerDialog.MonthYearPickerListener() {
                             @Override
-                            public void onPositiveButtonClick(int year, int monthOfYear) {
+                            public void onDateSet(int year, int monthOfYear) {
                                 result[YEAR] = year;
                                 result[MONTH] = monthOfYear;
                             }
